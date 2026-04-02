@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getProjects } from "./lib/projects";
 import { openProject } from "./lib/editor";
 import { getPreferences } from "./lib/preferences";
+import { filterProjects } from "./lib/search";
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
@@ -42,13 +43,7 @@ export default function Command() {
     );
   }
 
-  const filteredProjects = projects.filter((project) => {
-    const query = searchText.trim().toLowerCase();
-    const words = query.split(" ").filter(Boolean);
-    const searchableText = `${project.name} ${project.relativePath}`.toLowerCase();
-
-    return words.every((word) => searchableText.includes(word));
-  });
+  const filteredProjects = filterProjects(projects, searchText);
 
   return (
     <List filtering={false} onSearchTextChange={setSearchText}>
