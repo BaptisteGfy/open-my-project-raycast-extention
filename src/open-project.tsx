@@ -12,7 +12,7 @@ export default function Command() {
         <List.Item 
           key={project.path} 
           title={project.name} 
-          accessories={[{text: project.path}]} 
+          accessories={[{text: project.relativePath}]} 
           actions={
             <ActionPanel>
               <Action 

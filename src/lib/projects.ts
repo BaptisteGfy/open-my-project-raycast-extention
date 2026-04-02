@@ -1,23 +1,15 @@
 import { existsSync, readdirSync } from "fs";
-import { join } from "path";
+import { join, relative } from "path";
 import { Project } from "../types/project";
 
 const IGNORED_DIRECTORIES = ["node_modules", ".git", "dist", "build"];
 
 export function getProjects(rootPath: string): Project[] {
-  return exploreDirectory(rootPath);
+  //exploreDirectory(point de depart, base de référence)
+  return exploreDirectory(rootPath, rootPath);
 }
 
-function isProjectDirectory(directoryPath: string, directoryName: string): boolean {
-  if (directoryName.startsWith(".")) return false;
-
-  const hasPackageJson = existsSync(join(directoryPath, "package.json"));
-  const hasGitDirectory = existsSync(join(directoryPath, ".git"));
-
-  return hasPackageJson || hasGitDirectory;
-}
-
-function exploreDirectory(currentPath: string): Project[] {
+function exploreDirectory(currentPath: string, rootPath: string): Project[] {
   const entries = readdirSync(currentPath, { withFileTypes: true });
 
   let projects: Project[] = [];
@@ -32,15 +24,24 @@ function exploreDirectory(currentPath: string): Project[] {
       projects.push({
         name: entry.name,
         path: fullPath,
+        relativePath: relative(rootPath, fullPath),
       });
 
       continue;
     }
 
-    const subProjects = exploreDirectory(fullPath);
+    const subProjects = exploreDirectory(fullPath, rootPath);
     projects = projects.concat(subProjects);
   }
 
   return projects;
 }
 
+function isProjectDirectory(directoryPath: string, directoryName: string): boolean {
+  if (directoryName.startsWith(".")) return false;
+
+  const hasPackageJson = existsSync(join(directoryPath, "package.json"));
+  const hasGitDirectory = existsSync(join(directoryPath, ".git"));
+
+  return hasPackageJson || hasGitDirectory;
+}
