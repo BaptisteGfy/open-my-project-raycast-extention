@@ -15,7 +15,14 @@
       "name": "open-project",
       "title": "Open Project",
       "description": "",
-      "mode": "view"
+      "mode": "view",
+      "preferences": [{
+        "name": "editor",
+        "type": "textfield",
+        "title": "Editor Command",
+        "description": "Command used to open projects (e.g. code, cursor, idea)",
+        "default": "code"
+      }]
     }
   ],
   "dependencies": {

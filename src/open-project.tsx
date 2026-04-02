@@ -16,7 +16,7 @@ export default function Command() {
           actions={
             <ActionPanel>
               <Action 
-                title="Open in VS Code" 
+                title="Open Project" 
                 onAction={() => openProject(project.path)}
               />
             </ActionPanel>
