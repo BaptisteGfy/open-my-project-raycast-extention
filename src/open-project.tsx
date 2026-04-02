@@ -4,7 +4,7 @@ import { openProject } from "./lib/editor";
 
 // commande Raycast et interface principale (App.tsx)
 export default function Command() {
-  const projects = getProjects();
+  const projects = getProjects("/Users/baptiste/Dev");
   
   return (
     <List>
