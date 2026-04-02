@@ -1,5 +1,5 @@
-import { existsSync, readdirSync } from "fs";
-import { join, relative } from "path";
+import { existsSync, readdirSync } from "fs"; // fs = module node natif
+import { join, relative } from "path"; // path = module node natif
 import { Project } from "../types/project";
 
 const IGNORED_DIRECTORIES = ["node_modules", ".git", "dist", "build"];

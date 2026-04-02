@@ -1,14 +1,23 @@
 import { Action, ActionPanel, List } from "@raycast/api";
+import { useState } from "react";
 import { getProjects } from "./lib/projects";
 import { openProject } from "./lib/editor";
 
 // commande Raycast et interface principale (App.tsx)
 export default function Command() {
+  const [searchText, setSearchText] = useState("");
   const projects = getProjects("/Users/baptiste/Dev");
+
+  const filteredProjects = projects.filter((project) => {
+    const query = searchText.trim().toLowerCase();
+    const words = query.split(" ").filter(Boolean);
+    const searchableText = `${project.name} ${project.relativePath}`.toLowerCase();
+      return words.every((word) => searchableText.includes(word));
+  });
   
   return (
-    <List>
-      {projects.map((project) => (
+    <List filtering={false} onSearchTextChange={setSearchText}>
+      {filteredProjects.map((project) => (
         <List.Item 
           key={project.path} 
           title={project.name} 
