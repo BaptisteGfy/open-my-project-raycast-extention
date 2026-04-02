@@ -1,53 +1,58 @@
 import { Action, ActionPanel, List, openExtensionPreferences } from "@raycast/api";
 import { useState } from "react";
-import { getProjects } from "./lib/projects";
 import { openProject } from "./lib/editor";
 import { getPreferences } from "./lib/preferences";
-import { filterProjects } from "./lib/search";
+
+import { getProjectList } from "./lib/project-list";
+
+function BlockingStateView({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <List>
+      <List.EmptyView
+        title={title}
+        description={description}
+        actions={
+          <ActionPanel>
+            <Action title="Open Preferences" onAction={openExtensionPreferences} />
+          </ActionPanel>
+        }
+      />
+    </List>
+  );
+}
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
   const { rootFolder } = getPreferences();
+  const { projects, error } = getProjectList(rootFolder, searchText);
 
   if (!rootFolder) {
     return (
-      <List>
-        <List.EmptyView
-          title="No root folder selected"
-          description="Please configure a root folder in the extension settings."
-          actions={
-            <ActionPanel>
-              <Action title="Open Preferences" onAction={openExtensionPreferences} />
-            </ActionPanel>
-          }
-        />
-      </List>
+      <BlockingStateView
+        title="No root folder selected"
+        description="Please configure a root folder in the extension settings."
+      />
     );
   }
-
-  const { projects, error } = getProjects(rootFolder);
 
   if (error) {
     return (
-      <List>
-        <List.EmptyView
-          title="Cannot read folder"
-          description={error}
-          actions={
-            <ActionPanel>
-              <Action title="Open Preferences" onAction={openExtensionPreferences} />
-            </ActionPanel>
-          }
-        />
-      </List>
+      <BlockingStateView 
+        title="Cannot read folder" 
+        description={error} 
+      />
     );
   }
 
-  const filteredProjects = filterProjects(projects, searchText);
-
   return (
     <List filtering={false} onSearchTextChange={setSearchText}>
-      {filteredProjects.map((project) => (
+      {projects.map((project) => (
         <List.Item
           key={project.path}
           title={project.name}
