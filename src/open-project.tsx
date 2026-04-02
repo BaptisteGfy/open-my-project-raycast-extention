@@ -1,28 +1,24 @@
-import { ActionPanel, Action, Icon, List } from "@raycast/api";
+import { Action, ActionPanel, List } from "@raycast/api";
+import { getProjects } from "./lib/projects";
+import { openProject } from "./lib/editor";
 
-const ITEMS = Array.from(Array(3).keys()).map((key) => {
-  return {
-    id: key,
-    icon: Icon.Bird,
-    title: "Title " + key,
-    subtitle: "Subtitle",
-    accessory: "Accessory",
-  };
-});
-
+// commande Raycast et interface principale (App.tsx)
 export default function Command() {
+  const projects = getProjects();
+  
   return (
     <List>
-      {ITEMS.map((item) => (
-        <List.Item
-          key={item.id}
-          icon={item.icon}
-          title={item.title}
-          subtitle={item.subtitle}
-          accessories={[{ icon: Icon.Text, text: item.accessory }]}
+      {projects.map((project) => (
+        <List.Item 
+          key={project.path} 
+          title={project.name} 
+          accessories={[{text: project.path}]} 
           actions={
             <ActionPanel>
-              <Action.CopyToClipboard content={item.title} />
+              <Action 
+                title="Open in VS Code" 
+                onAction={() => openProject(project.path)}
+              />
             </ActionPanel>
           }
         />
