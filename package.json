@@ -16,13 +16,21 @@
       "title": "Open Project",
       "description": "",
       "mode": "view",
-      "preferences": [{
-        "name": "editor",
-        "type": "textfield",
-        "title": "Editor Command",
-        "description": "Command used to open projects (e.g. code, cursor, idea)",
-        "default": "code"
-      }]
+      "preferences": [
+        {
+          "name": "editor",
+          "type": "textfield",
+          "title": "Editor Command",
+          "description": "Command used to open projects (e.g. code, cursor, idea)",
+          "default": "code"
+        },
+        {
+          "name": "rootFolder",
+          "type": "directory",
+          "title": "Root Folder",
+          "description": "Root folder where projects will be searched"
+        }
+      ]
     }
   ],
   "dependencies": {
