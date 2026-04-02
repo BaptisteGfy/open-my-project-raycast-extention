@@ -1,12 +1,24 @@
-import { existsSync, readdirSync } from "fs"; // fs = module node natif
-import { join, relative } from "path"; // path = module node natif
+import { existsSync, readdirSync } from "fs";
+import { join, relative } from "path";
 import { Project } from "../types/project";
 
 const IGNORED_DIRECTORIES = ["node_modules", ".git", "dist", "build"];
 
-export function getProjects(rootPath: string): Project[] {
-  //exploreDirectory(point de depart, base de référence)
-  return exploreDirectory(rootPath, rootPath);
+type GetProjectsResult = {
+  projects: Project[];
+  error?: string;
+};
+
+export function getProjects(rootPath: string): GetProjectsResult {
+  try {
+    const projects = exploreDirectory(rootPath, rootPath);
+    return { projects };
+  } catch (error) {
+    return {
+      projects: [],
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 }
 
 function exploreDirectory(currentPath: string, rootPath: string): Project[] {
