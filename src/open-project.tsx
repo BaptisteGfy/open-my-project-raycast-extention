@@ -1,9 +1,15 @@
-import { Action, ActionPanel, List, openExtensionPreferences } from "@raycast/api";
-import { useState } from "react";
-import { openProject } from "./lib/editor";
-import { getPreferences } from "./lib/preferences";
-
-import { getProjectList } from "./lib/project-list";
+import {
+  Action,
+  ActionPanel,
+  List,
+  openExtensionPreferences,
+} from '@raycast/api';
+import { useEffect, useState } from 'react';
+import { openProject } from './lib/editor';
+import { getPreferences } from './lib/preferences';
+import { getProjects } from './lib/projects';
+import { filterProjects } from './lib/search';
+import { Project } from './types/project';
 
 function BlockingStateView({
   title,
@@ -19,7 +25,10 @@ function BlockingStateView({
         description={description}
         actions={
           <ActionPanel>
-            <Action title="Open Preferences" onAction={openExtensionPreferences} />
+            <Action
+              title="Open Preferences"
+              onAction={openExtensionPreferences}
+            />
           </ActionPanel>
         }
       />
@@ -28,9 +37,12 @@ function BlockingStateView({
 }
 
 export default function Command() {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
   const { rootFolder } = getPreferences();
-  const { projects, error } = getProjectList(rootFolder, searchText);
 
   if (!rootFolder) {
     return (
@@ -41,25 +53,38 @@ export default function Command() {
     );
   }
 
+  useEffect(() => {
+    setIsLoading(true);
+    const result = getProjects(rootFolder);
+
+    setProjects(result.projects);
+    setError(result.error);
+    setIsLoading(false);
+  }, [rootFolder]);
+
   if (error) {
-    return (
-      <BlockingStateView 
-        title="Cannot read folder" 
-        description={error} 
-      />
-    );
+    return <BlockingStateView title="Cannot read folder" description={error} />;
   }
 
+  const filteredProjects = filterProjects(projects, searchText);
+
   return (
-    <List filtering={false} onSearchTextChange={setSearchText}>
-      {projects.map((project) => (
+    <List
+      isLoading={isLoading}
+      filtering={false}
+      onSearchTextChange={setSearchText}
+    >
+      {filteredProjects.map((project) => (
         <List.Item
           key={project.path}
           title={project.name}
           accessories={[{ text: project.relativePath }]}
           actions={
             <ActionPanel>
-              <Action title="Open in Editor" onAction={() => openProject(project.path)} />
+              <Action
+                title="Open in Editor"
+                onAction={() => openProject(project.path)}
+              />
             </ActionPanel>
           }
         />
